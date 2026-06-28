@@ -538,6 +538,20 @@
       "cache": false,
       "outputs": ["dist/**", "build/**"]
     },
+    "@calcom/platform-constants#post-install": {
+      "outputs": ["dist/**"]
+    },
+    "@calcom/platform-types#post-install": {
+      "outputs": ["dist/**"]
+    },
+    "@calcom/platform-enums#post-install": {
+      "dependsOn": ["@calcom/platform-types#post-install"],
+      "outputs": ["dist/**"]
+    },
+    "@calcom/platform-utils#post-install": {
+      "dependsOn": ["@calcom/platform-types#post-install"],
+      "outputs": ["dist/**"]
+    },
     "start": {
       "outputs": ["dist/**", "build/**"]
     },
