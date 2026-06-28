@@ -106,6 +106,7 @@ import type { BookingType } from "../handleNewBooking/originalRescheduledBooking
 import { getOriginalRescheduledBooking } from "../handleNewBooking/originalRescheduledBookingUtils";
 import { scheduleNoShowTriggers } from "../handleNewBooking/scheduleNoShowTriggers";
 import type { IEventTypePaymentCredentialType, Invitee, IsFixedAwareUser } from "../handleNewBooking/types";
+import { assertValidBookingInput } from "../handleNewBooking/validateBookingInput";
 import { validateBookingTimeIsNotOutOfBounds } from "../handleNewBooking/validateBookingTimeIsNotOutOfBounds";
 import { validateEventLength } from "../handleNewBooking/validateEventLength";
 import handleSeats from "../handleSeats/handleSeats";
@@ -519,6 +520,8 @@ async function handler(
   });
 
   const isPlatformBooking = !!platformClientId;
+
+  assertValidBookingInput(rawBookingData);
 
   const eventType = await getEventType({
     eventTypeId: rawBookingData.eventTypeId,
