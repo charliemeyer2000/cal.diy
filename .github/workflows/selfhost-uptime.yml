@@ -1,0 +1,25 @@
+name: selfhost-uptime
+
+# Lightweight uptime check for https://calendar.charliemeyer.xyz — pings every 30 min.
+# If the site is unhealthy the job fails and GitHub emails the repo owner. No external service.
+# Caveats: GitHub scheduled runs can be delayed under load, and schedules auto-disable after 60
+# days of repo inactivity. For a stricter SLA use an external monitor (UptimeRobot/BetterStack).
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check homepage + a booking page
+        run: |
+          set -euo pipefail
+          home=$(curl -sS -o /dev/null -w '%{http_code}' -m 25 https://calendar.charliemeyer.xyz/ || echo 000)
+          book=$(curl -sS -o /dev/null -w '%{http_code}' -m 25 https://calendar.charliemeyer.xyz/charlie/30min || echo 000)
+          echo "home=$home book=$book"
+          case "$home" in 2*|3*) ;; *) echo "::error::homepage unhealthy ($home)"; exit 1 ;; esac
+          [ "$book" = "200" ] || { echo "::error::booking page unhealthy ($book)"; exit 1; }
+          echo "healthy"
