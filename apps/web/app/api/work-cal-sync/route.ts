@@ -90,12 +90,13 @@ export async function POST(req: NextRequest) {
   if (!getRes.ok) {
     return NextResponse.json({ error: "event fetch failed", status: getRes.status }, { status: 502 });
   }
-  const event = (await getRes.json()) as { attendees?: { email?: string }[] };
+  const event = (await getRes.json()) as { attendees?: { email?: string; responseStatus?: string }[] };
   const attendees = event.attendees ?? [];
   if (attendees.some((a) => a.email?.toLowerCase() === WORK_EMAIL.toLowerCase())) {
     return NextResponse.json({ ok: true, alreadyPresent: true });
   }
-  attendees.push({ email: WORK_EMAIL });
+  // pre-accept so the event shows on the work calendar without inbox action + counts as busy
+  attendees.push({ email: WORK_EMAIL, responseStatus: "accepted" });
 
   const patchRes = await fetch(`${base}?sendUpdates=all`, {
     method: "PATCH",

@@ -73,11 +73,12 @@ export async function GET(req: NextRequest) {
     const base = `https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(ref.uid)}`;
     const getRes = await fetch(base, { headers: { Authorization: `Bearer ${accessToken}` } });
     if (!getRes.ok) continue;
-    const event = (await getRes.json()) as { attendees?: { email?: string }[] };
+    const event = (await getRes.json()) as { attendees?: { email?: string; responseStatus?: string }[] };
     const attendees = event.attendees ?? [];
 
     if (!attendees.some((a) => a.email?.toLowerCase() === WORK_EMAIL.toLowerCase())) {
-      attendees.push({ email: WORK_EMAIL });
+      // pre-accept so the event shows on the work calendar without inbox action + counts as busy
+      attendees.push({ email: WORK_EMAIL, responseStatus: "accepted" });
       const patchRes = await fetch(`${base}?sendUpdates=all`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
